@@ -15,6 +15,7 @@ public class CalculatorEngine {
         precedence.put("log", 4);
         precedence.put("ln", 4);
         precedence.put("e", 4);
+        precedence.put("√", 4);
     }
 
     public double evaluate(String expression) {
@@ -32,8 +33,13 @@ public class CalculatorEngine {
             if (token.isEmpty()) {
                 continue;
             }
-            if (isNumber(token)) {
-                output.add(token);
+            if (isNumber(token) || token.equals("e")) {
+                if (isNumber(token)){
+                    output.add(token);
+                }
+                if (token.equals("e")) {
+                    output.add(String.valueOf(Math.exp(1)));
+                }
             } else if (isFunction(token)) {
                 operators.push(token);
             } else if (isOperator(token)) {
@@ -71,9 +77,8 @@ public class CalculatorEngine {
                     case "cos" -> stack.push(Math.cos(Math.toRadians(value)));
                     case "tan" -> stack.push(Math.tan(Math.toRadians(value)));
                     case "log" -> stack.push(Math.log10(value));
-                    case "e" -> stack.push(Math.exp(value));
                     case "ln" -> stack.push(Math.log(value));
-                    case "sqrt" -> stack.push(Math.sqrt(value));
+                    case "√" -> stack.push(Math.sqrt(value));
                 }
             } else if (isOperator(token)) {
                 double b = stack.pop();
@@ -104,6 +109,6 @@ public class CalculatorEngine {
     }
 
     private boolean isFunction(String token) {
-        return "sin cos tan ln log e sqrt".contains(token);
+        return "sin cos tan ln log √".contains(token);
     }
 }
