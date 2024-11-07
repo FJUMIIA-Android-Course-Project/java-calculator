@@ -20,7 +20,10 @@ public class CalculatorGUI extends JFrame implements ActionListener {
         memory = new MemoryHandler();
 
         field = new JTextField(16);
-        field.setEditable(false);
+        /*
+        * Let the text field editable to free the cursor.
+         * */
+        field.setEditable(true);
         field.setFont(new Font("Arial", Font.BOLD, 24));
         field.setHorizontalAlignment(JTextField.RIGHT);
         field.setPreferredSize(new Dimension(300, 50));
@@ -55,16 +58,27 @@ public class CalculatorGUI extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
 
-        if ((command.charAt(0) >= '0' && command.charAt(0) <= '9') || command.equals(".") || command.equals("(") || command.equals(")") || command.equals("e") || command.equals("^")) {
-            currentExpression += command;
-            field.setText(currentExpression);
-        } else if (command.equals("C")) {
+//        if (e.getSource() == field) {
+//            currentExpression = field.getText();
+//            double result = engine.evaluate(currentExpression);
+//            currentExpression = String.valueOf(result);
+//            field.setText(currentExpression);
+//            return;
+//        }
+
+        if (command.equals("C")) {
+//            Clear the field
             currentExpression = "";
             field.setText("");
         } else if (command.equals("=")) {
-            double result = engine.evaluate(currentExpression);
-            currentExpression = String.valueOf(result);
-            field.setText(currentExpression);
+            try {
+                double result = engine.evaluate(currentExpression);
+                currentExpression = String.valueOf(result);
+                field.setText(currentExpression);
+            } catch (Exception ex) {
+                field.setText("Invalid Expression");
+                currentExpression = "";
+            }
         } else if (command.equals("M+")) {
             memory.addToMemory(engine.evaluate(currentExpression));
         } else if (command.equals("M-")) {
@@ -75,7 +89,8 @@ public class CalculatorGUI extends JFrame implements ActionListener {
         } else if (command.equals("MC")) {
             memory.clearMemory();
         } else if (isFunction(command)) {
-            currentExpression += command.toLowerCase();
+//            If the op command is a function, we add "(" to the expression
+            currentExpression += command.toLowerCase() + "(";
             field.setText(currentExpression);
         } else {
             currentExpression += command;
@@ -84,8 +99,9 @@ public class CalculatorGUI extends JFrame implements ActionListener {
     }
 
     private boolean isFunction(String command) {
-        return "Sin Cos Tan Log Exp ! \u221a".contains(command);
+        return "sin cos tan log ! √".contains(command);
     }
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(CalculatorGUI::new);
